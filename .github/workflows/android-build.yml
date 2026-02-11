@@ -43,9 +43,12 @@ jobs:
       run: dotnet workload restore
 
     - name: Install MAUI workload
-      run: dotnet workload install maui
+      run: dotnet workload install maui-ubuntu
 
-    - name: List workloads
+    - name: Install Android workload
+      run: dotnet workload install android
+
+    - name: List installed workloads
       run: dotnet workload list
 
     - name: Restore dependencies
