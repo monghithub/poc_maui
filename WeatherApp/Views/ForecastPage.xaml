@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WeatherApp.Views.ForecastPage"
+             Title="7-Day Forecast">
+
+    <Grid RowDefinitions="Auto,*" Padding="20" BackgroundColor="#512BDF">
+
+        <!-- Header Section -->
+        <StackLayout Grid.Row="0" Spacing="10">
+            <Label Text="7-Day Weather Forecast" FontSize="28" FontAttributes="Bold" TextColor="White" />
+            <Label Text="{Binding Forecast.Location, StringFormat='📍 {0}'}" FontSize="16" TextColor="White" />
+        </StackLayout>
+
+        <!-- Content Section -->
+        <Grid Grid.Row="1" RowDefinitions="*,Auto">
+
+            <!-- Forecast List -->
+            <ScrollView Grid.Row="0">
+                <StackLayout Padding="0,20,0,0" Spacing="15">
+
+                    <!-- Error Message -->
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="#FF6B6B"
+                           FontSize="14"
+                           IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+
+                    <!-- Loading Indicator -->
+                    <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                       IsVisible="{Binding IsLoading}"
+                                       Color="White" />
+
+                    <!-- Forecast Items -->
+                    <StackLayout BindableLayout.ItemsSource="{Binding Forecast.Days}" Spacing="12">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Frame HasShadow="True"
+                                       CornerRadius="15"
+                                       BorderColor="White"
+                                       BackgroundColor="#6A4C93"
+                                       Padding="15">
+                                    <StackLayout Spacing="10">
+
+                                        <!-- Date -->
+                                        <Label Text="{Binding Date, StringFormat='📅 {0:dddd, MMMM d, yyyy}'}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="White" />
+
+                                        <!-- Weather Description -->
+                                        <Label Text="{Binding Description}"
+                                               FontSize="14"
+                                               TextColor="White"
+                                               FontAttributes="Italic" />
+
+                                        <!-- Temperature Row -->
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+                                            <StackLayout Grid.Column="0" Spacing="5">
+                                                <Label Text="High" FontSize="12" TextColor="LightGray" />
+                                                <Label Text="{Binding MaxTemp, StringFormat='{0:F1}°C'}"
+                                                       FontSize="18"
+                                                       FontAttributes="Bold"
+                                                       TextColor="White" />
+                                            </StackLayout>
+                                            <StackLayout Grid.Column="1" Spacing="5">
+                                                <Label Text="Low" FontSize="12" TextColor="LightGray" />
+                                                <Label Text="{Binding MinTemp, StringFormat='{0:F1}°C'}"
+                                                       FontSize="18"
+                                                       FontAttributes="Bold"
+                                                       TextColor="White" />
+                                            </StackLayout>
+                                        </Grid>
+
+                                        <!-- Separator -->
+                                        <BoxView Color="White" HeightRequest="1" />
+
+                                        <!-- Weather Details -->
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="20" RowSpacing="10">
+                                            <!-- Precipitation -->
+                                            <StackLayout Grid.Column="0" Grid.Row="0" Spacing="3">
+                                                <Label Text="💧 Precipitation" FontSize="12" TextColor="LightGray" />
+                                                <Label Text="{Binding Precipitation, StringFormat='{0:F1} mm'}"
+                                                       FontSize="14"
+                                                       TextColor="White" />
+                                            </StackLayout>
+
+                                            <!-- Wind Speed -->
+                                            <StackLayout Grid.Column="1" Grid.Row="0" Spacing="3">
+                                                <Label Text="💨 Wind Speed" FontSize="12" TextColor="LightGray" />
+                                                <Label Text="{Binding WindSpeed, StringFormat='{0:F1} km/h'}"
+                                                       FontSize="14"
+                                                       TextColor="White" />
+                                            </StackLayout>
+                                        </Grid>
+
+                                    </StackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </StackLayout>
+
+                    <!-- Empty State -->
+                    <Label Text="No forecast data available"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           FontSize="16"
+                           TextColor="White"
+                           IsVisible="{Binding Forecast, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=Inverted}"
+                           Opacity="0.7" />
+                </StackLayout>
+            </ScrollView>
+
+            <!-- Refresh Button -->
+            <Button Grid.Row="1"
+                    Text="🔄 Refresh"
+                    Command="{Binding RefreshForecastCommand}"
+                    BackgroundColor="#FF6B6B"
+                    TextColor="White"
+                    Padding="20,15"
+                    CornerRadius="8"
+                    Margin="0,20,0,0"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource StringToBoolConverter}}" />
+        </Grid>
+    </Grid>
+</ContentPage>

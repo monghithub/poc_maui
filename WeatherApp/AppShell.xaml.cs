@@ -1,3 +1,5 @@
+using WeatherApp.Views;
+
 namespace WeatherApp
 {
     public partial class AppShell : Shell
@@ -5,6 +7,7 @@ namespace WeatherApp
         public AppShell()
         {
             InitializeComponent();
+            Routing.RegisterRoute("forecast", typeof(ForecastPage));
         }
     }
 }

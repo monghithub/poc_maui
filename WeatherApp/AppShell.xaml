@@ -12,4 +12,9 @@
             Route="MainPage" />
     </TabBar>
 
+    <ShellContent
+        Title="Forecast"
+        ContentTemplate="{DataTemplate local:ForecastPage}"
+        Route="forecast" />
+
 </Shell>

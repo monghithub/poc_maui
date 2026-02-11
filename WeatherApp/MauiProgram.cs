@@ -22,8 +22,11 @@ namespace WeatherApp
                 })
                 .Services
                     .AddSingleton<IWeatherService, WeatherService>()
+                    .AddSingleton<SearchHistoryService>()
                     .AddSingleton<MainPage>()
-                    .AddSingleton<MainPageViewModel>();
+                    .AddSingleton<MainPageViewModel>()
+                    .AddSingleton<ForecastPage>()
+                    .AddSingleton<ForecastPageViewModel>();
 
             return builder.Build();
         }

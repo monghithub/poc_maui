@@ -8,6 +8,7 @@ namespace WeatherApp.Services
         private readonly HttpClient _httpClient;
         private const string OpenMeteoBaseUrl = "https://api.open-meteo.com/v1/forecast";
         private const string NominatimBaseUrl = "https://nominatim.openstreetmap.org/search";
+        private const string ReverseNominatimBaseUrl = "https://nominatim.openstreetmap.org/reverse";
 
         public WeatherService()
         {
@@ -18,7 +19,6 @@ namespace WeatherApp.Services
         {
             try
             {
-                // First, get coordinates from city name using Nominatim
                 var coordinates = await GetCoordinatesByCityAsync(city);
                 if (coordinates == null)
                     throw new Exception($"City '{city}' not found");
@@ -63,7 +63,57 @@ namespace WeatherApp.Services
             }
         }
 
-        private async Task<(double Latitude, double Longitude)?> GetCoordinatesByCityAsync(string city)
+        public async Task<SevenDayForecast> GetSevenDayForecastAsync(double latitude, double longitude, string cityName)
+        {
+            try
+            {
+                var url = $"{OpenMeteoBaseUrl}?latitude={latitude}&longitude={longitude}&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,wind_speed_10m_max&timezone=auto";
+
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var weatherResponse = JsonSerializer.Deserialize<WeatherResponse>(content, options);
+
+                if (weatherResponse?.Daily == null)
+                    throw new Exception("Invalid forecast data received");
+
+                var forecast = new SevenDayForecast
+                {
+                    Location = cityName,
+                    Latitude = latitude,
+                    Longitude = longitude,
+                    FetchedAt = DateTime.Now
+                };
+
+                var daily = weatherResponse.Daily;
+                for (int i = 0; i < Math.Min(7, daily.Time.Count); i++)
+                {
+                    if (DateTime.TryParse(daily.Time[i], out var date))
+                    {
+                        forecast.Days.Add(new ForecastDay
+                        {
+                            Date = date,
+                            MaxTemp = daily.MaxTemperature[i],
+                            MinTemp = daily.MinTemperature[i],
+                            Description = GetWeatherDescription(daily.WeatherCode[i]),
+                            WeatherCode = daily.WeatherCode[i],
+                            Precipitation = daily.PrecipitationSum[i],
+                            WindSpeed = daily.WindSpeedMax[i]
+                        });
+                    }
+                }
+
+                return forecast;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error getting 7-day forecast: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<(double Latitude, double Longitude)?> GetCoordinatesByCityAsync(string city)
         {
             try
             {
@@ -91,6 +141,76 @@ namespace WeatherApp.Services
             catch (Exception ex)
             {
                 throw new Exception($"Error getting coordinates: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<bool> RequestLocationPermissionAsync()
+        {
+            try
+            {
+                var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+                if (status != PermissionStatus.Granted)
+                {
+                    status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                }
+                return status == PermissionStatus.Granted;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<(double Latitude, double Longitude)?> GetCurrentLocationAsync()
+        {
+            try
+            {
+                var hasPermission = await RequestLocationPermissionAsync();
+                if (!hasPermission)
+                    return null;
+
+                var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
+                var location = await Geolocation.Default.GetLocationAsync(request);
+
+                if (location != null)
+                {
+                    return (location.Latitude, location.Longitude);
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting current location: {ex.Message}");
+                return null;
+            }
+        }
+
+        private async Task<string> GetCityNameFromCoordinatesAsync(double latitude, double longitude)
+        {
+            try
+            {
+                var url = $"{ReverseNominatimBaseUrl}?lat={latitude}&lon={longitude}&format=json";
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var content = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<JsonElement>(content, options);
+
+                if (result.TryGetProperty("address", out var address))
+                {
+                    if (address.TryGetProperty("city", out var city))
+                        return city.GetString() ?? "Unknown Location";
+                    if (address.TryGetProperty("town", out var town))
+                        return town.GetString() ?? "Unknown Location";
+                }
+
+                return "Unknown Location";
+            }
+            catch
+            {
+                return "Unknown Location";
             }
         }
 

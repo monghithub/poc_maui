@@ -4,13 +4,14 @@
              x:Class="WeatherApp.Views.MainPage"
              Title="Weather App">
 
-    <Grid RowDefinitions="Auto,*" Padding="20" BackgroundColor="#512BDF">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20" BackgroundColor="#512BDF">
 
         <!-- Search Section -->
         <StackLayout Grid.Row="0" Spacing="10">
             <Label Text="Weather Forecast" FontSize="28" FontAttributes="Bold" TextColor="White" />
 
-            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <!-- Search Bar with Location Button -->
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
                 <Entry Grid.Column="0"
                        x:Name="CityEntry"
                        Placeholder="Enter city name"
@@ -22,18 +23,83 @@
                        CornerRadius="8" />
 
                 <Button Grid.Column="1"
-                        Text="Search"
+                        Text="🔍"
                         Command="{Binding SearchWeatherCommand}"
                         BackgroundColor="#FF6B6B"
                         TextColor="White"
-                        Padding="20,0"
-                        CornerRadius="8" />
+                        Padding="15,0"
+                        CornerRadius="8"
+                        FontSize="18" />
+
+                <Button Grid.Column="2"
+                        Text="📍"
+                        Command="{Binding UseCurrentLocationCommand}"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White"
+                        Padding="15,0"
+                        CornerRadius="8"
+                        FontSize="18" />
             </Grid>
+
+            <!-- History Toggle Button -->
+            <Button Text="{Binding ShowSearchHistory, StringFormat='📋 {0}'}"
+                    Command="{Binding ToggleSearchHistoryCommand}"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    Padding="20,10"
+                    CornerRadius="8"
+                    FontSize="14" />
         </StackLayout>
 
-        <!-- Content Section -->
-        <ScrollView Grid.Row="1">
-            <StackLayout Padding="0,20,0,0" Spacing="20">
+        <!-- Search History Section -->
+        <ScrollView Grid.Row="1" IsVisible="{Binding ShowSearchHistory}">
+            <StackLayout Padding="0,20,0,20" Spacing="10">
+                <Label Text="Recent Searches"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="White" />
+
+                <StackLayout BindableLayout.ItemsSource="{Binding SearchHistory}" Spacing="8">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                <Button Grid.Column="0"
+                                        Text="{Binding CityName, StringFormat='📍 {0}'}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectHistoryItemCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#6A4C93"
+                                        TextColor="White"
+                                        Padding="15,10"
+                                        CornerRadius="8"
+                                        FontSize="14"
+                                        HorizontalOptions="FillAndExpand" />
+
+                                <Button Grid.Column="1"
+                                        Text="✕"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ClearHistoryItemCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#FF6B6B"
+                                        TextColor="White"
+                                        Padding="12,10"
+                                        CornerRadius="8"
+                                        FontSize="14" />
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+
+                <Label Text="No search history yet"
+                       HorizontalOptions="Center"
+                       FontSize="14"
+                       TextColor="White"
+                       Opacity="0.7"
+                       IsVisible="{Binding SearchHistory.Count, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Inverted}" />
+            </StackLayout>
+        </ScrollView>
+
+        <!-- Weather Content Section -->
+        <ScrollView Grid.Row="1" IsVisible="{Binding ShowSearchHistory, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Inverted}">
+            <StackLayout Padding="0,20,0,20" Spacing="20">
 
                 <!-- Error Message -->
                 <Label Text="{Binding ErrorMessage}"
@@ -60,6 +126,12 @@
                                FontSize="20"
                                FontAttributes="Bold"
                                TextColor="White" />
+
+                        <!-- Device Location Indicator -->
+                        <Label Text="(Using device location)"
+                               FontSize="12"
+                               TextColor="#FFD700"
+                               IsVisible="{Binding UseDeviceLocation}" />
 
                         <!-- Temperature -->
                         <StackLayout Orientation="Horizontal" Spacing="10">
@@ -113,5 +185,16 @@
                        Opacity="0.7" />
             </StackLayout>
         </ScrollView>
+
+        <!-- Forecast Button -->
+        <Button Grid.Row="2"
+                Text="📅 View 7-Day Forecast"
+                Command="{Binding GoToForecastCommand}"
+                BackgroundColor="#FF9800"
+                TextColor="White"
+                Padding="20,15"
+                CornerRadius="8"
+                FontSize="16"
+                IsEnabled="{Binding CurrentWeather, Converter={StaticResource NullToVisibilityConverter}}" />
     </Grid>
 </ContentPage>
