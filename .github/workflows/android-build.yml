@@ -30,13 +30,9 @@ jobs:
       working-directory: ./WeatherApp
       run: dotnet restore
 
-    - name: Build APK (Debug)
+    - name: Build APK (Release)
       working-directory: ./WeatherApp
-      run: dotnet build -f net9.0-android -c Debug
-
-    - name: Publish APK (Release)
-      working-directory: ./WeatherApp
-      run: dotnet publish -f net9.0-android -c Release --no-build
+      run: dotnet build -f net9.0-android -c Release -p:AndroidPackageFormat=apk -p:AndroidCreatePackagePerAbi=false
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
