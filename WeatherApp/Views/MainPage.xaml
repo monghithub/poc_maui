@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WeatherApp.Views.MainPage"
+             Title="Weather App">
+
+    <Grid RowDefinitions="Auto,*" Padding="20" BackgroundColor="#512BDF">
+
+        <!-- Search Section -->
+        <StackLayout Grid.Row="0" Spacing="10">
+            <Label Text="Weather Forecast" FontSize="28" FontAttributes="Bold" TextColor="White" />
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <Entry Grid.Column="0"
+                       x:Name="CityEntry"
+                       Placeholder="Enter city name"
+                       PlaceholderColor="LightGray"
+                       Text="{Binding SearchCity}"
+                       BackgroundColor="White"
+                       TextColor="Black"
+                       Padding="10"
+                       CornerRadius="8" />
+
+                <Button Grid.Column="1"
+                        Text="Search"
+                        Command="{Binding SearchWeatherCommand}"
+                        BackgroundColor="#FF6B6B"
+                        TextColor="White"
+                        Padding="20,0"
+                        CornerRadius="8" />
+            </Grid>
+        </StackLayout>
+
+        <!-- Content Section -->
+        <ScrollView Grid.Row="1">
+            <StackLayout Padding="0,20,0,0" Spacing="20">
+
+                <!-- Error Message -->
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="#FF6B6B"
+                       FontSize="14"
+                       IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+
+                <!-- Loading Indicator -->
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                   IsVisible="{Binding IsLoading}"
+                                   Color="White" />
+
+                <!-- Weather Info -->
+                <Frame HasShadow="True"
+                       CornerRadius="15"
+                       BorderColor="White"
+                       BackgroundColor="#6A4C93"
+                       IsVisible="{Binding CurrentWeather, Converter={StaticResource NullToVisibilityConverter}}"
+                       Padding="20">
+                    <StackLayout Spacing="15">
+
+                        <!-- Location -->
+                        <Label Text="{Binding CurrentWeather.Location, StringFormat='📍 {0}'}"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+
+                        <!-- Temperature -->
+                        <StackLayout Orientation="Horizontal" Spacing="10">
+                            <Label Text="🌡️" FontSize="24" VerticalOptions="Center" />
+                            <Label Text="{Binding CurrentWeather.Temperature, StringFormat='{0:F1}°C'}"
+                                   FontSize="32"
+                                   FontAttributes="Bold"
+                                   TextColor="White"
+                                   VerticalOptions="Center" />
+                        </StackLayout>
+
+                        <!-- Description -->
+                        <Label Text="{Binding CurrentWeather.Description}"
+                               FontSize="16"
+                               TextColor="White"
+                               FontAttributes="Italic" />
+
+                        <!-- Separator -->
+                        <BoxView Color="White" HeightRequest="1" />
+
+                        <!-- Humidity -->
+                        <StackLayout Orientation="Horizontal" Spacing="10">
+                            <Label Text="💧 Humidity:" FontSize="14" TextColor="White" />
+                            <Label Text="{Binding CurrentWeather.Humidity, StringFormat='{0}%'}"
+                                   FontSize="14"
+                                   TextColor="White" />
+                        </StackLayout>
+
+                        <!-- Wind Speed -->
+                        <StackLayout Orientation="Horizontal" Spacing="10">
+                            <Label Text="💨 Wind Speed:" FontSize="14" TextColor="White" />
+                            <Label Text="{Binding CurrentWeather.WindSpeed, StringFormat='{0:F1} km/h'}"
+                                   FontSize="14"
+                                   TextColor="White" />
+                        </StackLayout>
+
+                        <!-- Updated Time -->
+                        <Label Text="{Binding CurrentWeather.UpdatedAt, StringFormat='Last updated: {0:HH:mm:ss}'}"
+                               FontSize="12"
+                               TextColor="#E0E0E0" />
+                    </StackLayout>
+                </Frame>
+
+                <!-- Initial Message -->
+                <Label Text="Search for a city to see the weather forecast"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       FontSize="16"
+                       TextColor="White"
+                       IsVisible="{Binding CurrentWeather, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=Inverted}"
+                       Opacity="0.7" />
+            </StackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

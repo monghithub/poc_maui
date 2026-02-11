@@ -1,0 +1,64 @@
+# MAUI
+bin/
+obj/
+.vs/
+.vscode/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options
+.vs/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# Android build output
+.gradle/
+build/
+*.apk
+*.aab
+*.ap_
+
+# Jetbrains IDE
+.idea/
+*.iml
+
+# macOS
+.DS_Store
+
+# OS specific
+Thumbs.db
+
+# Dependencies
+packages/
+
+# Local environment files
+.env
+.env.local
+
+# Android SDK
