@@ -23,13 +23,20 @@ jobs:
     - name: Install MAUI workload
       run: dotnet workload install maui android
 
+    - name: List installed workloads
+      run: dotnet workload list
+
     - name: Restore dependencies
       working-directory: ./WeatherApp
       run: dotnet restore
 
-    - name: Build APK
+    - name: Build APK (Debug)
       working-directory: ./WeatherApp
-      run: dotnet publish -f net9.0-android -c Release
+      run: dotnet build -f net9.0-android -c Debug
+
+    - name: Publish APK (Release)
+      working-directory: ./WeatherApp
+      run: dotnet publish -f net9.0-android -c Release --no-build
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
