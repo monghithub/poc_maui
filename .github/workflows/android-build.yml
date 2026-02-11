@@ -15,38 +15,40 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup .NET
+    - name: Setup .NET 9.0
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '9.0.x'
+        dotnet-version: '9.0.100'
 
-    - name: Install workload manifest
-      run: |
-        dotnet workload restore
-        dotnet workload install maui android
+    - name: Restore workloads
+      run: dotnet workload restore
+      working-directory: ./WeatherApp
 
-    - name: Verify .NET and workloads
-      run: |
-        dotnet --version
-        dotnet workload list
+    - name: Install MAUI workload
+      run: dotnet workload install maui -v diag
+
+    - name: Install Android workload
+      run: dotnet workload install android -v diag
+
+    - name: List installed workloads
+      run: dotnet workload list
+
+    - name: Clear NuGet cache
+      run: dotnet nuget locals all --clear
 
     - name: Restore dependencies
       working-directory: ./WeatherApp
-      run: dotnet restore
+      run: dotnet restore --no-cache
 
-    - name: Build APK (Debug first)
+    - name: Build APK
       working-directory: ./WeatherApp
-      run: dotnet build -f net9.0-android -c Debug
-
-    - name: Publish APK (Release)
-      working-directory: ./WeatherApp
-      run: dotnet publish -f net9.0-android -c Release --no-build
+      run: dotnet publish -f net9.0-android -c Release -p:AndroidPackageFormat=apk
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
         name: weather-app-apk
-        path: WeatherApp/bin/Release/net9.0-android/publish/*.apk
+        path: WeatherApp/bin/Release/net9.0-android/publish/com.monghit.weatherapp*.apk
         retention-days: 30
 
     - name: Create Release
