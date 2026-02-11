@@ -9,47 +9,19 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup .NET 8.0 (LTS - Stable)
+    - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x'
-
-    - name: Install Java JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '11'
-
-    - name: Install Android SDK tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y android-sdk-build-tools android-sdk-platform-tools
-
-    - name: Setup Android SDK
-      run: |
-        export ANDROID_HOME=$HOME/Android/Sdk
-        mkdir -p $ANDROID_HOME
-        echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-        echo "$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-
-    - name: Restore workloads
-      working-directory: ./WeatherApp
-      run: dotnet workload restore
+        dotnet-version: '9.0.x'
 
     - name: Install MAUI workload
-      run: dotnet workload install maui-ubuntu
-
-    - name: Install Android workload
-      run: dotnet workload install android
-
-    - name: List installed workloads
-      run: dotnet workload list
+      run: dotnet workload install maui android
 
     - name: Restore dependencies
       working-directory: ./WeatherApp
@@ -57,17 +29,17 @@ jobs:
 
     - name: Build APK
       working-directory: ./WeatherApp
-      run: dotnet publish -f net8.0-android -c Release -p:AndroidPackageFormat=apk
+      run: dotnet publish -f net9.0-android -c Release
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
         name: weather-app-apk
-        path: WeatherApp/bin/Release/net8.0-android/publish/com.monghit.weatherapp*.apk
+        path: WeatherApp/bin/Release/net9.0-android/publish/com.monghit.weatherapp*.apk
         retention-days: 30
 
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
-        files: WeatherApp/bin/Release/net8.0-android/publish/com.monghit.weatherapp.apk
+        files: WeatherApp/bin/Release/net9.0-android/publish/com.monghit.weatherapp.apk

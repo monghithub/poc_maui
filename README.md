@@ -115,6 +115,7 @@ WeatherApp/
 
 ## 🎨 Características
 
+### Core
 - ✅ Búsqueda de clima por nombre de ciudad
 - ✅ Información en tiempo real
 - ✅ UI moderna con MAUI XAML
@@ -122,6 +123,14 @@ WeatherApp/
 - ✅ Manejo de errores
 - ✅ Indicador de carga
 - ✅ Actualización de hora
+
+### Avanzadas
+- ✅ **Geolocalización automática** - Detecta ubicación del dispositivo
+- ✅ **Pronóstico de 7 días** - Predicción detallada para próxima semana
+- ✅ **Historial de búsquedas** - Guarda últimas 10 ciudades buscadas
+- ✅ **Almacenamiento local** - Persiste datos en el dispositivo
+- ✅ **Reverse geocoding** - Convierte coordenadas a nombres de ciudad
+- ✅ **Pull-to-refresh** - Actualiza datos deslizando hacia abajo
 
 ## 🔐 Permisos de Android
 
@@ -148,12 +157,64 @@ Asegúrate de que:
 - Un emulador Android está corriendo, O
 - Un dispositivo Android está conectado vía USB
 
+## 📚 Documentación Detallada
+
+Para información completa sobre las características avanzadas, consulta:
+- **[FEATURES.md](./FEATURES.md)** - Documentación detallada de todas las características
+- **[ANDROID_BUILD.md](./ANDROID_BUILD.md)** - Guía de compilación para Android
+
+## 🎯 Flujo de la Aplicación
+
+```
+┌─────────────────┐
+│  Abrir App      │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────────────┐
+│  ¿Permitir ubicación?   │
+└────────┬────────────────┘
+         │
+    ┌────┴────┐
+    │          │
+    ▼          ▼
+[SÍ]         [NO]
+    │          │
+    │          ▼
+    │    └──────────────┐
+    │                   │
+    ▼                   ▼
+┌──────────────┐  ┌─────────────┐
+│ Ubicación    │  │ London      │
+│ del GPS      │  │ (Default)   │
+└───┬──────────┘  └──────┬──────┘
+    │                    │
+    └────────┬───────────┘
+             │
+             ▼
+    ┌────────────────┐
+    │ Mostrar Clima  │
+    │ Actual         │
+    └────┬───────────┘
+         │
+    ┌────┴────────────────────────────┐
+    │                                 │
+    ▼                                 ▼
+ ┌────────┐                    ┌──────────────┐
+ │ 📍     │ - Actualizar      │ 📋 Historial │
+ │ 🔍     │ - Nueva búsqueda  │ 📅 Pronóstico│
+ │ 📋     │ - Ver historial   └──────────────┘
+ └────────┘
+```
+
 ## 📝 Notas
 
 - La aplicación usa `Open-Meteo` y `Nominatim` que son servicios públicos y gratuitos
 - No requiere API keys
 - La información del clima se actualiza en tiempo real
 - Los datos se obtienen en la unidad de medida del servidor (Celsius para temperatura, km/h para velocidad del viento)
+- El historial se almacena localmente en el dispositivo usando MAUI Preferences
+- La geolocalización requiere permiso explícito del usuario en Android
 
 ## 📄 Licencia
 
