@@ -20,25 +20,31 @@ jobs:
       with:
         dotnet-version: '9.0.100'
 
-    - name: Restore workloads
+    - name: Restore workloads from WeatherApp
       run: dotnet workload restore
       working-directory: ./WeatherApp
 
     - name: Install MAUI workload
-      run: dotnet workload install maui -v diag
+      run: dotnet workload install maui
 
     - name: Install Android workload
-      run: dotnet workload install android -v diag
+      run: dotnet workload install android
 
     - name: List installed workloads
       run: dotnet workload list
+
+    - name: Check SDK resolver
+      run: |
+        dotnet --version
+        dotnet --list-sdks
+        dotnet --list-runtimes
 
     - name: Clear NuGet cache
       run: dotnet nuget locals all --clear
 
     - name: Restore dependencies
       working-directory: ./WeatherApp
-      run: dotnet restore --no-cache
+      run: dotnet restore --verbosity diagnostic 2>&1 | head -100
 
     - name: Build APK
       working-directory: ./WeatherApp
