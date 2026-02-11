@@ -1,10 +1,5 @@
 {
   "sdk": {
-    "rollForward": "latestMinor",
-    "version": "9.0.100"
-  },
-  "msbuild-sdks": {
-    "Microsoft.Maui.Sdk": "9.0.120",
-    "Microsoft.Android.Sdk": "35.0.105"
+    "rollForward": "latestFeature"
   }
 }

@@ -30,17 +30,11 @@ jobs:
 
     - name: Restore dependencies
       working-directory: ./WeatherApp
-      run: dotnet restore --verbosity diagnostic
+      run: dotnet restore
 
     - name: Build APK (Release)
       working-directory: ./WeatherApp
-      run: |
-        echo "Checking SDK availability..."
-        dotnet msbuild WeatherApp.csproj -t:_GetVisualStudioInfo
-
-        echo "Attempting to build APK..."
-        dotnet publish -f net9.0-android -c Release -p:AndroidPackageFormat=apk || \
-        dotnet build -f net9.0-android -c Release -p:AndroidPackageFormat=apk
+      run: dotnet publish -f net9.0-android -c Release -p:AndroidPackageFormat=apk
 
     - name: Find and Upload APK artifact
       uses: actions/upload-artifact@v4
