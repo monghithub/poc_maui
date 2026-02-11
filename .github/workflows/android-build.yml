@@ -26,9 +26,13 @@ jobs:
     - name: List installed workloads
       run: dotnet workload list
 
+    - name: Restore workloads from project
+      working-directory: ./WeatherApp
+      run: dotnet workload restore
+
     - name: Restore dependencies
       working-directory: ./WeatherApp
-      run: dotnet restore
+      run: dotnet restore --verbosity diagnostic 2>&1 | head -200
 
     - name: Build APK (Release)
       working-directory: ./WeatherApp
