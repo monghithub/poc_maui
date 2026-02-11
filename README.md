@@ -45,7 +45,18 @@ cd WeatherApp
 
 ## 🚀 Compilación y Ejecución
 
-### Compilar para Android
+### Compilación Automática con GitHub Actions (Recomendado)
+
+La compilación automática se ejecuta en **macOS** (donde MAUI es completamente soportado):
+
+1. Cada push a `master`, `main` o `develop` dispara el workflow
+2. El APK se compila automáticamente
+3. El artefacto está disponible en **Actions** → **Latest Run** → **Artifacts**
+4. Para crear una release con el APK, crea un tag: `git tag v1.0 && git push github v1.0`
+
+**Ver compilaciones:** https://github.com/monghithub/poc_maui/actions
+
+### Compilar Localmente (Solo macOS)
 
 ```bash
 # Compilar en modo debug
@@ -54,6 +65,8 @@ dotnet build -f net9.0-android
 # Compilar en modo release
 dotnet publish -f net9.0-android -c Release
 ```
+
+**Nota:** La compilación en **Linux** no es soportada por MAUI. Usa GitHub Actions en su lugar.
 
 ### Ejecutar en emulador o dispositivo
 
@@ -144,7 +157,14 @@ Estos se definen en `Platforms/Android/AndroidManifest.xml`
 ## 🐛 Troubleshooting
 
 ### Error: "MAUI workload not compatible with this platform"
-Este error ocurre en Linux. Necesitas compilar en **Windows** o **macOS**. Alternatively, puedes usar Visual Studio Code desde Windows.
+Este error ocurre en **Linux**. La compilación de MAUI no es soportada en Linux.
+
+**Solución:** Usa **GitHub Actions** que compila automáticamente en macOS. El workflow `android-build-macos.yml` se ejecuta automáticamente en cada push:
+- Compila el APK en macOS
+- Lo publica como artefacto en GitHub
+- Está disponible para descargar en la sección de Actions
+
+No necesitas compilar localmente en Linux. ✅
 
 ### Error: "Android SDK not found"
 Instala el Android SDK:
